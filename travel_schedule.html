@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅行スケジュール 5/3〜5/5</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Shippori+Mincho:wght@400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --paper: #f5f0e8;
+    --cream: #ede6d6;
+    --brown: #7a5c3a;
+    --rust: #c4622d;
+    --forest: #3a6b4a;
+    --sky: #4a7fa0;
+    --muted: #8a7a6a;
+    --line: #c8b89a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    min-height: 100vh;
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='0.5' fill='%23b09a7a' opacity='0.3'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Language toggle */
+  .lang-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .lang-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 7px 14px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s ease;
+  }
+
+  .lang-btn.active {
+    background: var(--brown);
+    color: var(--paper);
+  }
+
+  .lang-btn:hover:not(.active) {
+    background: var(--line);
+    color: var(--ink);
+  }
+
+  /* i18n show/hide */
+  body.en-mode .ja { display: none; }
+  body.ja-mode .en { display: none; }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+    padding-bottom: 40px;
+    border-bottom: 2px solid var(--line);
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .stamp {
+    display: inline-block;
+    border: 2px solid var(--rust);
+    color: var(--rust);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+    transform: rotate(-1deg);
+    opacity: 0.85;
+  }
+
+  .header h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .header .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    font-weight: 300;
+  }
+
+  .header .dates {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--brown);
+    margin-top: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .day {
+    margin-bottom: 50px;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+  .day:nth-child(1) { animation-delay: 0.1s; }
+  .day:nth-child(2) { animation-delay: 0.25s; }
+  .day:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .day-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--paper);
+    background: var(--brown);
+    padding: 3px 10px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  .day-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+  }
+
+  .day-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--brown), var(--line));
+  }
+
+  .event {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .event::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--brown);
+  }
+
+  .event.highlight::before {
+    background: var(--rust);
+    border-color: var(--rust);
+    width: 9px;
+    height: 9px;
+    top: 6px;
+    left: -25px;
+  }
+
+  .event-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--rust);
+    letter-spacing: 0.1em;
+    margin-bottom: 3px;
+  }
+
+  .event-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+
+  .event-detail {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+    font-weight: 300;
+  }
+
+  .train-card {
+    background: var(--cream);
+    border-left: 3px solid var(--sky);
+    border-radius: 0 4px 4px 0;
+    padding: 12px 16px;
+    margin: 8px 0 4px;
+  }
+
+  .train-card .train-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--sky);
+    letter-spacing: 0.15em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .train-route {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+  }
+
+  .train-route .arrow { color: var(--sky); font-size: 16px; }
+
+  .train-times {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    align-items: center;
+  }
+
+  .train-times span { color: var(--ink); font-weight: 400; }
+
+  .seat-info {
+    font-size: 11px;
+    color: var(--forest);
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .transfer-warn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--rust);
+    background: #fdf2ec;
+    border: 1px solid #e8b49a;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  .stay-card {
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-top: 8px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .stay-icon { font-size: 22px; line-height: 1; margin-top: 2px; }
+
+  .stay-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.03em;
+  }
+
+  .stay-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: 0.03em;
+  }
+
+  .rental-card {
+    background: var(--cream);
+    border-left: 3px solid var(--forest);
+    padding: 10px 14px;
+    margin-top: 6px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .rental-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--forest);
+    letter-spacing: 0.15em;
+    margin-bottom: 3px;
+  }
+
+  .rental-detail { font-size: 13px; color: var(--ink); letter-spacing: 0.02em; }
+
+  .sep {
+    text-align: center;
+    color: var(--line);
+    font-size: 18px;
+    letter-spacing: 0.4em;
+    margin: 40px 0;
+    user-select: none;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+  }
+
+  .note {
+    background: #f0ebe0;
+    border: 1px dashed var(--line);
+    padding: 12px 16px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 40px 24px 80px; }
+    .header h1 { font-size: 26px; }
+    .day-date { display: none; }
+    .train-route { font-size: 13px; }
+    .lang-toggle { top: 12px; right: 12px; }
+  }
+
+  @media print {
+    body { background: white; }
+    body::before { display: none; }
+    .day { opacity: 1; transform: none; animation: none; }
+    .lang-toggle { display: none; }
+  }
+</style>
+</head>
+<body class="ja-mode">
+
+<!-- Language Toggle -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="btn-ja" onclick="setLang('ja')">JP</button>
+  <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="stamp">
+      <span class="ja">最終確定版 · 6名様</span>
+      <span class="en">FINAL · 6 GUESTS</span>
+    </div>
+    <h1>
+      <span class="ja">旅行スケジュール<br>2025</span>
+      <span class="en">Travel Itinerary<br>2025</span>
+    </h1>
+    <div class="dates">MAY 3 (SUN) — MAY 5 (TUE)</div>
+    <div class="subtitle">
+      <span class="ja">新大阪発 ／ 白樺湖・富士山麓</span>
+      <span class="en">Departing Shin-Osaka ／ Lake Shirakaba · Mt. Fuji</span>
+    </div>
+  </div>
+
+  <!-- Day 1 -->
+  <div class="day">
+    <div class="day-header">
+      <span class="day-num">DAY 1</span>
+      <span class="day-title">
+        <span class="ja">白樺湖へ</span>
+        <span class="en">To Lake Shirakaba</span>
+      </span>
+      <span class="day-date">
+        <span class="ja">5月3日（日）</span>
+        <span class="en">May 3 (Sun)</span>
+      </span>
+    </div>
+    <div class="timeline">
+
+      <div class="event highlight">
+        <div class="event-time">08:57</div>
+        <div class="event-title">
+          <span class="ja">新大阪駅 出発</span>
+          <span class="en">Depart Shin-Osaka Station</span>
+        </div>
+        <div class="train-card">
+          <div class="train-name">🚄 <span class="ja">のぞみ 82号</span><span class="en">Nozomi No.82</span></div>
+          <div class="train-route">
+            <span class="ja">新大阪</span><span class="en">Shin-Osaka</span>
+            <span class="arrow">→</span>
+            <span class="ja">名古屋</span><span class="en">Nagoya</span>
+          </div>
+          <div class="train-times">
+            <span>08:57</span> <span class="ja">発</span><span class="en">dep</span>
+            &nbsp;→&nbsp;
+            <span>09:47</span> <span class="ja">着</span><span class="en">arr</span>
+          </div>
+          <div class="seat-info">
+            <span class="ja">5号車　17番・18番　A・B・C席</span>
+            <span class="en">Car 5 · Seats 17 &amp; 18 · A, B, C</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time">
+          <span class="ja">09:47 着 ／ 10:00 発</span>
+          <span class="en">09:47 arr &nbsp;/&nbsp; 10:00 dep</span>
+        </div>
+        <div class="event-title">
+          <span class="ja">名古屋駅 乗り換え</span>
+          <span class="en">Transfer at Nagoya Station</span>
+        </div>
+        <div class="event-detail">
+          <span class="ja">乗り換え時間：13分</span>
+          <span class="en">Transfer time: 13 min</span>
+        </div>
+        <div class="train-card">
+          <div class="train-name">🚃 <span class="ja">特急しなの 7号</span><span class="en">Ltd. Exp. Shinano No.7</span></div>
+          <div class="train-route">
+            <span class="ja">名古屋</span><span class="en">Nagoya</span>
+            <span class="arrow">→</span>
+            <span class="ja">塩尻</span><span class="en">Shiojiri</span>
+          </div>
+          <div class="train-times">
+            <span>10:00</span> <span class="ja">発</span><span class="en">dep</span>
+            &nbsp;→&nbsp;
+            <span>11:54</span> <span class="ja">着</span><span class="en">arr</span>
+          </div>
+          <div class="seat-info">
+            <span class="ja">6号車　1番 A・B・C・D席、2番 A・B席</span>
+            <span class="en">Car 6 · Seat 1 (A,B,C,D) · Seat 2 (A,B)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time">
+          <span class="ja">11:54 着 ／ 11:59 発</span>
+          <span class="en">11:54 arr &nbsp;/&nbsp; 11:59 dep</span>
+        </div>
+        <div class="event-title">
+          <span class="ja">塩尻駅 乗り換え</span>
+          <span class="en">Transfer at Shiojiri Station</span>
+        </div>
+        <div class="transfer-warn">
+          <span class="ja">⚡ 乗り換え5分！お急ぎください</span>
+          <span class="en">⚡ Only 5 min — please hurry!</span>
+        </div>
+        <div class="train-card">
+          <div class="train-name">🚂 <span class="ja">中央本線 普通 甲府行き</span><span class="en">Chuo Line Local · Kofu-bound</span></div>
+          <div class="train-route">
+            <span class="ja">塩尻</span><span class="en">Shiojiri</span>
+            <span class="arrow">→</span>
+            <span class="ja">茅野</span><span class="en">Chino</span>
+          </div>
+          <div class="train-times">
+            <span>11:59</span> <span class="ja">発</span><span class="en">dep</span>
+            &nbsp;→&nbsp;
+            <span>12:34</span> <span class="ja">着</span><span class="en">arr</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event highlight">
+        <div class="event-time">12:34</div>
+        <div class="event-title">
+          <span class="ja">茅野駅 到着</span>
+          <span class="en">Arrive Chino Station</span>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time">13:00〜</div>
+        <div class="event-title">
+          <span class="ja">レンタカー貸出</span>
+          <span class="en">Car Rental Pick-up</span>
+        </div>
+        <div class="rental-card">
+          <div class="rental-label">🚗 <span class="ja">ニッポンレンタカー 茅野駅西口店</span><span class="en">Nippon Rent-A-Car · Chino Sta. West Exit</span></div>
+          <div class="rental-detail">
+            <span class="ja">予約番号：Z20198</span>
+            <span class="en">Reservation No.: Z20198</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time"><span class="ja">午後</span><span class="en">Afternoon</span></div>
+        <div class="event-title">
+          <span class="ja">白樺湖へドライブ</span>
+          <span class="en">Drive to Lake Shirakaba</span>
+        </div>
+        <div class="event-detail">
+          <span class="ja">車窓から八ヶ岳の眺めをお楽しみください</span>
+          <span class="en">Enjoy views of the Yatsugatake mountains along the way</span>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time"><span class="ja">夕方〜</span><span class="en">Evening</span></div>
+        <div class="event-title">
+          <span class="ja">チェックイン・宿泊</span>
+          <span class="en">Check-in &amp; Stay</span>
+        </div>
+        <div class="stay-card">
+          <div class="stay-icon">🏨</div>
+          <div>
+            <div class="stay-name">
+              <span class="ja">白樺リゾート　池の平ホテル</span>
+              <span class="en">Shirakaba Resort · Ikenodaira Hotel</span>
+            </div>
+            <div class="stay-sub">
+              <span class="ja">白樺湖畔 ／ 長野県茅野市</span>
+              <span class="en">Lake Shirakaba, Chino, Nagano</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sep">· · ·</div>
+
+  <!-- Day 2 -->
+  <div class="day">
+    <div class="day-header">
+      <span class="day-num">DAY 2</span>
+      <span class="day-title">
+        <span class="ja">富士山麓へ</span>
+        <span class="en">To Mt. Fuji Foothills</span>
+      </span>
+      <span class="day-date">
+        <span class="ja">5月4日（月・祝）</span>
+        <span class="en">May 4 (Mon · Holiday)</span>
+      </span>
+    </div>
+    <div class="timeline">
+
+      <div class="event">
+        <div class="event-time"><span class="ja">午前</span><span class="en">Morning</span></div>
+        <div class="event-title">
+          <span class="ja">池の平ホテル チェックアウト</span>
+          <span class="en">Check-out from Ikenodaira Hotel</span>
+        </div>
+        <div class="event-detail">
+          <span class="ja">静岡県・十里木高原へ出発</span>
+          <span class="en">Depart for Juurigi Highland, Shizuoka</span>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time"><span class="ja">昼頃（約2時間半の移動）</span><span class="en">Around noon (~2.5 hr drive)</span></div>
+        <div class="event-title">
+          <span class="ja">富士山麓・十里木高原 到着</span>
+          <span class="en">Arrive Juurigi Highland, Mt. Fuji area</span>
+        </div>
+        <div class="event-detail">
+          <span class="ja">車窓から富士山の眺めもお楽しみに</span>
+          <span class="en">Enjoy Mt. Fuji views from the road</span>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time"><span class="ja">チェックイン前</span><span class="en">Before check-in</span></div>
+        <div class="event-title">
+          <span class="ja">買い出し ＆ 周辺観光</span>
+          <span class="en">Grocery Run &amp; Sightseeing</span>
+        </div>
+        <div class="note">
+          <span class="ja">🛒 BBQの食材・飲み物など購入<br>📍 周辺スポットの観光もお楽しみください</span>
+          <span class="en">🛒 Pick up BBQ food &amp; drinks<br>📍 Explore nearby sights &amp; attractions</span>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time"><span class="ja">夕方〜夜</span><span class="en">Evening → Night</span></div>
+        <div class="event-title">
+          <span class="ja">別荘でバーベキュー 🔥</span>
+          <span class="en">BBQ at the Villa 🔥</span>
+        </div>
+        <div class="stay-card">
+          <div class="stay-icon">🏡</div>
+          <div>
+            <div class="stay-name">
+              <span class="ja">十里木の別荘</span>
+              <span class="en">Juurigi Villa</span>
+            </div>
+            <div class="stay-sub">
+              <span class="ja">静岡県 富士山麓・十里木高原</span>
+              <span class="en">Juurigi Highland, Shizuoka (Mt. Fuji area)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sep">· · ·</div>
+
+  <!-- Day 3 -->
+  <div class="day">
+    <div class="day-header">
+      <span class="day-num">DAY 3</span>
+      <span class="day-title">
+        <span class="ja">帰路へ</span>
+        <span class="en">Homeward Bound</span>
+      </span>
+      <span class="day-date">
+        <span class="ja">5月5日（火・祝）</span>
+        <span class="en">May 5 (Tue · Holiday)</span>
+      </span>
+    </div>
+    <div class="timeline">
+
+      <div class="event">
+        <div class="event-time"><span class="ja">日中</span><span class="en">Daytime</span></div>
+        <div class="event-title">
+          <span class="ja">富士山周辺の観光 ／ 別荘でのんびり</span>
+          <span class="en">Sightseeing near Mt. Fuji / Relax at the villa</span>
+        </div>
+        <div class="event-detail">
+          <span class="ja">最終日もゆっくりとお楽しみください</span>
+          <span class="en">Take it easy and savor the last day</span>
+        </div>
+      </div>
+
+      <div class="event highlight">
+        <div class="event-time"><span class="ja">19:00 まで</span><span class="en">By 19:00</span></div>
+        <div class="event-title">
+          <span class="ja">レンタカー返却</span>
+          <span class="en">Return Rental Car</span>
+        </div>
+        <div class="rental-card">
+          <div class="rental-label">🚗 <span class="ja">ニッポンレンタカー 新富士駅前店</span><span class="en">Nippon Rent-A-Car · Shin-Fuji Station</span></div>
+        </div>
+      </div>
+
+      <div class="event">
+        <div class="event-time">19:00〜</div>
+        <div class="event-title">
+          <span class="ja">新富士駅 → 静岡駅へ移動</span>
+          <span class="en">Shin-Fuji → Shizuoka Station</span>
+        </div>
+        <div class="train-card">
+          <div class="train-name">🚄 <span class="ja">こだま号（例）</span><span class="en">Kodama (example)</span></div>
+          <div class="train-route">
+            <span class="ja">新富士</span><span class="en">Shin-Fuji</span>
+            <span class="arrow">→</span>
+            <span class="ja">静岡</span><span class="en">Shizuoka</span>
+          </div>
+          <div class="train-times">
+            <span>19:37</span> <span class="ja">発</span><span class="en">dep</span>
+            &nbsp;→&nbsp;
+            <span>19:47</span> <span class="ja">着（約10分）</span><span class="en">arr (~10 min)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event highlight">
+        <div class="event-time">20:07</div>
+        <div class="event-title">
+          <span class="ja">静岡駅 出発</span>
+          <span class="en">Depart Shizuoka Station</span>
+        </div>
+        <div class="train-card">
+          <div class="train-name">🚄 <span class="ja">ひかり 659号</span><span class="en">Hikari No.659</span></div>
+          <div class="train-route">
+            <span class="ja">静岡</span><span class="en">Shizuoka</span>
+            <span class="arrow">→</span>
+            <span class="ja">新大阪</span><span class="en">Shin-Osaka</span>
+          </div>
+          <div class="train-times">
+            <span>20:07</span> <span class="ja">発</span><span class="en">dep</span>
+            &nbsp;→&nbsp;
+            <span>22:03</span> <span class="ja">着</span><span class="en">arr</span>
+          </div>
+          <div class="seat-info">
+            <span class="ja">6号車　14番・15番　A・B・C席</span>
+            <span class="en">Car 6 · Seats 14 &amp; 15 · A, B, C</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event highlight">
+        <div class="event-time">22:03</div>
+        <div class="event-title">
+          <span class="ja">新大阪駅 到着 🎉</span>
+          <span class="en">Arrive Shin-Osaka 🎉</span>
+        </div>
+        <div class="event-detail">
+          <span class="ja">お疲れさまでした！</span>
+          <span class="en">What a wonderful trip — well done everyone!</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 TRAVEL ITINERARY · 6 GUESTS · 5.3–5.5
+  </div>
+
+</div>
+
+<script>
+  function setLang(lang) {
+    document.body.className = lang + '-mode';
+    document.getElementById('btn-ja').classList.toggle('active', lang === 'ja');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  }
+</script>
+</body>
+</html>
