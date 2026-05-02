@@ -39,7 +39,6 @@
     z-index: 0;
   }
 
-  /* Language toggle */
   .lang-toggle {
     position: fixed;
     top: 20px;
@@ -65,17 +64,9 @@
     transition: all 0.2s ease;
   }
 
-  .lang-btn.active {
-    background: var(--brown);
-    color: var(--paper);
-  }
+  .lang-btn.active { background: var(--brown); color: var(--paper); }
+  .lang-btn:hover:not(.active) { background: var(--line); color: var(--ink); }
 
-  .lang-btn:hover:not(.active) {
-    background: var(--line);
-    color: var(--ink);
-  }
-
-  /* i18n show/hide */
   body.en-mode .ja { display: none; }
   body.ja-mode .en { display: none; }
 
@@ -319,6 +310,8 @@
     letter-spacing: 0.03em;
   }
 
+  .transfer-warn a { color: var(--rust); }
+
   .stay-card {
     background: var(--cream);
     border: 1px solid var(--line);
@@ -339,6 +332,14 @@
     letter-spacing: 0.03em;
   }
 
+  .stay-name a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stay-name a:hover { border-bottom-color: var(--brown); }
+
   .stay-sub {
     font-size: 11px;
     color: var(--muted);
@@ -349,7 +350,7 @@
   .rental-card {
     background: var(--cream);
     border-left: 3px solid var(--forest);
-    padding: 10px 14px;
+    padding: 12px 16px;
     margin-top: 6px;
     border-radius: 0 4px 4px 0;
   }
@@ -359,10 +360,27 @@
     font-size: 10px;
     color: var(--forest);
     letter-spacing: 0.15em;
-    margin-bottom: 3px;
+    margin-bottom: 6px;
   }
 
-  .rental-detail { font-size: 13px; color: var(--ink); letter-spacing: 0.02em; }
+  .rental-row {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--ink);
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+  }
+
+  .rental-key {
+    color: var(--muted);
+    white-space: nowrap;
+    min-width: 100px;
+  }
+
+  .rental-val { color: var(--ink); }
+  .rental-val a { color: var(--forest); text-decoration: none; }
+  .rental-val a:hover { text-decoration: underline; }
 
   .sep {
     text-align: center;
@@ -401,6 +419,7 @@
     .day-date { display: none; }
     .train-route { font-size: 13px; }
     .lang-toggle { top: 12px; right: 12px; }
+    .rental-key { min-width: 80px; }
   }
 
   @media print {
@@ -413,7 +432,6 @@
 </head>
 <body class="ja-mode">
 
-<!-- Language Toggle -->
 <div class="lang-toggle">
   <button class="lang-btn active" id="btn-ja" onclick="setLang('ja')">JP</button>
   <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
@@ -428,8 +446,8 @@
       <span class="en">FINAL · 6 GUESTS</span>
     </div>
     <h1>
-      <span class="ja">旅行スケジュール<br>2025</span>
-      <span class="en">Travel Itinerary<br>2025</span>
+      <span class="ja">旅行スケジュール<br>2026</span>
+      <span class="en">Travel Itinerary<br>2026</span>
     </h1>
     <div class="dates">MAY 3 (SUN) — MAY 5 (TUE)</div>
     <div class="subtitle">
@@ -520,8 +538,8 @@
           <span class="en">Transfer at Shiojiri Station</span>
         </div>
         <div class="transfer-warn">
-          <span class="ja">⚡ 乗り換え5分！お急ぎください</span>
-          <span class="en">⚡ Only 5 min — please hurry!</span>
+          <span class="ja">⚡ 乗り換え5分！お急ぎください　<a href="https://howtojourney.com/16718/" target="_blank">乗り換え案内 →</a></span>
+          <span class="en">⚡ Only 5 min — please hurry!　<a href="https://howtojourney.com/16718/" target="_blank">Transfer guide →</a></span>
         </div>
         <div class="train-card">
           <div class="train-name">🚂 <span class="ja">中央本線 普通 甲府行き</span><span class="en">Chuo Line Local · Kofu-bound</span></div>
@@ -554,22 +572,21 @@
         </div>
         <div class="rental-card">
           <div class="rental-label">🚗 <span class="ja">ニッポンレンタカー 茅野駅西口店</span><span class="en">Nippon Rent-A-Car · Chino Sta. West Exit</span></div>
-          <div class="rental-detail">
-            <span class="ja">予約番号：Z20198</span>
-            <span class="en">Reservation No.: Z20198</span>
-          </div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">予約番号</span><span class="en">Reservation</span></span><span class="rental-val">Z20198</span></div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">お名前</span><span class="en">Name</span></span><span class="rental-val"><span class="ja">イトウマサヒコ 様</span><span class="en">Mr. Masahiko Ito</span></span></div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">出発日時</span><span class="en">Pick-up</span></span><span class="rental-val">05/03 (日) 13:00</span></div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">返却日時</span><span class="en">Return</span></span><span class="rental-val">05/05 (火) 19:00</span></div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">出発店舗</span><span class="en">Pick-up store</span></span><span class="rental-val"><span class="ja">茅野駅西口</span><span class="en">Chino Sta. West Exit</span>&nbsp;<a href="tel:05017122886">📞 050-1712-2886</a></span></div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">返却店舗</span><span class="en">Return store</span></span><span class="rental-val"><span class="ja">新富士駅前</span><span class="en">Shin-Fuji Sta.</span>&nbsp;<a href="tel:05017122575">📞 050-1712-2575</a></span></div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">クラス</span><span class="en">Class</span></span><span class="rental-val"><span class="ja">ミニバン（禁煙車）</span><span class="en">Minivan (Non-smoking)</span></span></div>
         </div>
       </div>
 
       <div class="event">
         <div class="event-time"><span class="ja">午後</span><span class="en">Afternoon</span></div>
         <div class="event-title">
-          <span class="ja">白樺湖へドライブ</span>
-          <span class="en">Drive to Lake Shirakaba</span>
-        </div>
-        <div class="event-detail">
-          <span class="ja">車窓から八ヶ岳の眺めをお楽しみください</span>
-          <span class="en">Enjoy views of the Yatsugatake mountains along the way</span>
+          <span class="ja">山小屋を訪れる ⛰️</span>
+          <span class="en">Visit a Mountain Hut ⛰️</span>
         </div>
       </div>
 
@@ -590,6 +607,7 @@
               <span class="ja">白樺湖畔 ／ 長野県茅野市</span>
               <span class="en">Lake Shirakaba, Chino, Nagano</span>
             </div>
+            <a href="https://www.shirakabaresort.jp/ikenotaira-hotel/" target="_blank" style="display:inline-block;margin-top:8px;padding:5px 12px;background:var(--sky);color:#fff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-decoration:none;border-radius:2px;">🌐 <span class="ja">公式サイト →</span><span class="en">Official Site →</span></a>
           </div>
         </div>
       </div>
@@ -639,22 +657,31 @@
       </div>
 
       <div class="event">
-        <div class="event-time"><span class="ja">チェックイン前</span><span class="en">Before check-in</span></div>
+        <div class="event-time"><span class="ja">別荘到着前</span><span class="en">Before arriving at villa</span></div>
         <div class="event-title">
-          <span class="ja">買い出し ＆ 周辺観光</span>
-          <span class="en">Grocery Run &amp; Sightseeing</span>
+          <span class="ja">タケちゃん・マリコさんと合流 🤝</span>
+          <span class="en">Meet up with Take-chan &amp; Mariko-san 🤝</span>
         </div>
-        <div class="note">
-          <span class="ja">🛒 BBQの食材・飲み物など購入<br>📍 周辺スポットの観光もお楽しみください</span>
-          <span class="en">🛒 Pick up BBQ food &amp; drinks<br>📍 Explore nearby sights &amp; attractions</span>
+
+      </div>
+
+      <div class="event">
+        <div class="event-time"><span class="ja">夕食</span><span class="en">Dinner</span></div>
+        <div class="event-title">
+          <span class="ja">レストランで夕食 🍽️</span>
+          <span class="en">Dinner at Restaurant 🍽️</span>
+        </div>
+        <div class="event-detail">
+          <span class="ja">予約済み</span>
+          <span class="en">Reservation confirmed</span>
         </div>
       </div>
 
       <div class="event">
-        <div class="event-time"><span class="ja">夕方〜夜</span><span class="en">Evening → Night</span></div>
+        <div class="event-time"><span class="ja">夜〜</span><span class="en">Night</span></div>
         <div class="event-title">
-          <span class="ja">別荘でバーベキュー 🔥</span>
-          <span class="en">BBQ at the Villa 🔥</span>
+          <span class="ja">別荘へチェックイン</span>
+          <span class="en">Check-in at Villa</span>
         </div>
         <div class="stay-card">
           <div class="stay-icon">🏡</div>
@@ -711,6 +738,7 @@
         </div>
         <div class="rental-card">
           <div class="rental-label">🚗 <span class="ja">ニッポンレンタカー 新富士駅前店</span><span class="en">Nippon Rent-A-Car · Shin-Fuji Station</span></div>
+          <div class="rental-row"><span class="rental-key"><span class="ja">電話番号</span><span class="en">Phone</span></span><span class="rental-val"><a href="tel:05017122575">📞 050-1712-2575</a></span></div>
         </div>
       </div>
 
@@ -776,7 +804,7 @@
   </div>
 
   <div class="footer">
-    © 2025 TRAVEL ITINERARY · 6 GUESTS · 5.3–5.5
+    © 2026 TRAVEL ITINERARY · 6 GUESTS · 5.3–5.5
   </div>
 
 </div>
